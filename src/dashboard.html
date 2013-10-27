@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="ja">
+    <head>
+<!--(bake /bake_template/html_head_meta.html)-->
+        <title>ダッシュボード</title>
+<!--(bake /bake_template/html_head_link.html)-->
+        <style>
+            .mainChart {
+                height:320px;
+            }
+            .subChart {
+                height:240px;
+            }
+        </style>
+    </head>
+    <body id="dashborad">
+<!--(bake /bake_template/html_body_header.html)-->
+        <div id="contents">
+            <div class="container">
+                <div class="row">
+                    <h1>ダッシュボード</h1>
+                    <h2>見た目年齢</h2>
+                    <div id="ageChart" class="mainChart"></div>
+                </div>
+            </div><!-- /container -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-4">
+                        <h3>見た目性別</h3>
+                        <div id="sexChart" class="subChart"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>見た目スマイル</h3>
+                        <div id="smileChart" class="subChart"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>困った度</h3>
+                        <div id="troubleChart" class="subChart"></div>
+                    </div>
+                </div>
+            </div><!-- /container -->
+            <div class="container">
+                <div class="row">
+                    <div class="col-lg-offset-2 col-lg-4">
+                        <h3>見た目動物</h3>
+                        <div id="animalChart" class="subChart"></div>
+                    </div>
+                    <div class="col-lg-4">
+                        <h3>ドヤァ</h3>
+                        <div id="doyaaChart" class="subChart"></div>
+                    </div>
+                </div>
+            </div><!-- /container -->
+        </div>
+<!--(bake /bake_template/html_body_footer.html)-->
+<!--(bake /bake_template/script.html)-->
+        <script src="http://yui.yahooapis.com/3.13.0/build/yui/yui-min.js"></script>
+        <script src="js/dashboard.js"></script>
+    </body>
+</html>

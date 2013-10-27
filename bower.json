@@ -1,0 +1,14 @@
+{
+  "name": "faceoff",
+  "ignore": [
+    "**/.*",
+    "node_modules",
+    "bower_components",
+    "test",
+    "tests"
+  ],
+  "dependencies": {
+    "bootstrap": "~3.0.0",
+    "jquery.cookie": "~1.4.0"
+  }
+}

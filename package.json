@@ -1,0 +1,16 @@
+{
+  "name": "faceoff",
+  "description": "",
+  "version": "0.0.1",
+  "author": "tobitobita",
+  "dependencies": {},
+  "devDependencies": {
+    "grunt": "~0.4.1",
+    "grunt-contrib-clean": "~0.5.0",
+    "grunt-contrib-copy": "~0.4.1",
+    "grunt-contrib-concat": "~0.3.0",
+    "grunt-contrib-connect": "~0.5.0",
+    "grunt-bake": "~0.3.1",
+    "grunt-contrib-watch": "~0.5.3"
+  }
+}

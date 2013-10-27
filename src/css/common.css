@@ -1,0 +1,29 @@
+@charset 'utf-8';
+
+body {
+    background-color:#eee;
+}
+
+header {
+    background-color:#1ba1e2;
+    color:#fff;
+}
+
+#contents {
+    background-color:#fff;
+    padding:1em 0;
+}
+
+footer {
+    clear:both;
+}
+
+/**
+ * ログイン
+ */
+
+#index #auth {
+    position:relative;
+    margin:1em auto;
+    width:320px;
+}

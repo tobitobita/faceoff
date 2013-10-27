@@ -6,9 +6,22 @@ var DATA_LIMIT = 30;
 
 var graphDatas = [];
 
+function _url_vars() {
+    var vars = new Object, params;
+    var temp_params = window.location.search.substring(1).split('&');
+    for(var i = 0; i <temp_params.length; i++) {
+        params = temp_params[i].split('=');
+        vars[params[0]] = params[1];
+    }
+    return vars;
+}
+
 $(document).ready(function() {
     console.log('start');
+    var userId = _url_vars()['u'];
+    $('#userId').append(userId);
     var query = new NCMB.Query(FaceInformation);
+    query.equalTo("userId", userId);
     query.descending("createDate");
     query.limit(DATA_LIMIT);
     query.find({
@@ -73,7 +86,12 @@ $(document).ready(function() {
                     doyaaData[i] = undefined;
                 }
             }
-            console.log(graphDatas);
+            var imgQuery = new NCMB.Query(FaceImage);
+            imgQuery.get(graphDatas['key_1'], {
+                success: function(results) {
+                    $('#myLoginFace').append('<p>1回前のログイン顔<br><img src="data:' + results.get('mime') + ';base64,' + results.get('base64') + '" width="165">');
+                }
+            });
             var ageDatas = [
                 mainCount.reverse()
                 , myAge.reverse()
@@ -92,24 +110,18 @@ $(document).ready(function() {
                     , tooltip : {
                         markerLabelFunction: function(categoryItem, valueItem, itemIndex, series, seriesIndex) {
                             var msg = document.createElement("div");
-                            $(msg).attr('id', 'item_' + categoryItem.value);
                             if(seriesIndex == 1) {
                                 console.log(graphDatas['key_' + categoryItem.value]);
-                                var img = new Image();
                                 var faceImgId = graphDatas['key_' + categoryItem.value];
                                 var imgQuery = new NCMB.Query(FaceImage);
                                 imgQuery.get(faceImgId, {
                                     success: function(results) {
-                                        $('#' + 'item_' + categoryItem.value).append('<img src="data:' + results.get('mime') + ';base64,' + results.get('base64') + '" width="128">');
+                                        $('#myLoginFace p').remove();
+                                        $('#myLoginFace').append('<p>' + categoryItem.value + '回前のログイン顔<br><img src="data:' + results.get('mime') + ';base64,' + results.get('base64') + '" width="128">');
                                     }
                                 });
-//                                faceImg.fetch({
-//                                    success: function(object) {
-//                                    }
-//                                });
-                            } else if(seriesIndex == 0) {
-                                $(msg).append('<p>' + valueItem.value + '歳</p>');
                             }
+                            $(msg).append('<p>' + valueItem.value + '歳</p>');
                             return msg; 
                         }
                     }

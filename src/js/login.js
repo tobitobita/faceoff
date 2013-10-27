@@ -9,7 +9,7 @@ var tempCanvas;
 NCMB.initialize("03f14794fcaa21cf389b3d752541483c5f664f25c908cec012a6ccd59235f90f", "5ce863d747e637c2fca8722105d0aa60e778a569a1032f5c122f4ef0e27d01f8");
 var FaceInformation = NCMB.Object.extend("FaceInformation");
 var FaceImage = NCMB.Object.extend("FaceImage");
-
+var FaceUser = NCMB.Object.extend("FaceUser");
 
 function doDelete(faceId) {
     console.log('doDelete');
@@ -63,7 +63,7 @@ function doKnowledge(userId) {
             faceInfo.save(null, {
                 success: function(result) {
                     console.log('knowlegde success.');
-                    window.location = 'success.html';
+                    window.location = 'dashboard.html?u=' + userId;
                 }
             });
         }
@@ -73,56 +73,74 @@ function doKnowledge(userId) {
     });
 }
 
-function doPost(userId, data) {
+function doPost(userId, password, data) {
     console.log('doPost');
-    $.ajax({
-        type:"POST"
-        , url:API_CERTIFICATION_URL
-        , data:data
-        , success: function(res) {
-            var resObj = $.xml2json(res);
-            var success = false;
-            if(resObj.faceVerification.errorMessage === 'no face.' || resObj.faceVerification.verificationFaceInfo.candidate === undefined) {
-                $('#messages').append('<div class="alert alert-danger"><p>違います！</p></div>');
-            } else {
-                var candidates = resObj.faceVerification.verificationFaceInfo.candidate;
-                console.log(candidates);
-                if(!(candidates instanceof Array)) {
-                    candidates = [candidates];
+    
+    var query = new NCMB.Query(FaceUser);
+    query.equalTo("userId", userId);
+    query.find({
+        success: function(results) {
+            var rsUserId = results[0].get('userId');
+            var rsPassword = results[0].get('password');
+            console.log('get : ' + rsUserId + ', input : ' + userId);
+            console.log('get : ' + rsPassword + ', input : ' + password);
+            $.ajax({
+                type:"POST"
+                , url:API_CERTIFICATION_URL
+                , data:data
+                , success: function(res) {
+                    var resObj = $.xml2json(res);
+                    var success = false;
+                    if(resObj.faceVerification.errorMessage === 'no face.' || resObj.faceVerification.verificationFaceInfo.candidate === undefined) {
+                        $('#messages').append('<div class="alert alert-danger"><p>違います！</p></div>');
+                    } else {
+                        var candidates = resObj.faceVerification.verificationFaceInfo.candidate;
+                        console.log(candidates);
+                        if(!(candidates instanceof Array)) {
+                            candidates = [candidates];
+                        }
+                        console.log('check');
+                        candidates.sort(function(obj1, obj2) {
+                            if( obj1.score < obj2.score ) return -1;
+                            if( obj1.score > obj2.score ) return 1;
+                            return 0;
+                        });
+                        console.log(candidates);
+                        var gettedUserId = 'USER_ID_TEMP';
+                        for(var i = 0; i < candidates.length; ++i) {
+                            if(candidates[i].tag === userId) {
+                                gettedUserId = candidates[i].tag;
+                                break;
+                            }
+                        }
+                        if(userId === rsUserId && password === rsPassword && gettedUserId === userId) {
+                            success = true;
+                        } else {
+                            $('#messages').append('<div class="alert alert-warning"><p>もう一度！</p></div>');
+                        }
+                    }
+                    if(resObj.faceVerification.verificationFaceInfo !== undefined) {
+                        console.log('delete picture.');
+                        doDelete(resObj.faceVerification.verificationFaceInfo.faceId);
+                    }
+                    if(success) {
+                        $.cookie('userId', $('#userId').val());
+                        doKnowledge(userId);
+                    } else {
+                        $('#pic img').remove();
+                        $('#face').append('<video id="myFace" width="320" height="240" controls autoplay></video>');
+                        play();
+                    }
                 }
-                console.log('check');
-                candidates.sort(function(obj1, obj2) {
-                    if( obj1.score < obj2.score ) return -1;
-                    if( obj1.score > obj2.score ) return 1;
-                    return 0;
-                });
-                console.log(candidates);
-                if(candidates[0].tag === userId) {
-                    success = true;
-                } else {
-                    $('#messages').append('<div class="alert alert-warning"><p>もう一度！</p></div>');
+                , error: function(res) {
+                    console.log(res.responseText);
                 }
-            }
-            if(resObj.faceVerification.verificationFaceInfo !== undefined) {
-                console.log('delete picture.');
-                doDelete(resObj.faceVerification.verificationFaceInfo.faceId);
-            }
-            if(success) {
-                $.cookie('userId', $('#userId').val());
-                doKnowledge(userId);
-            } else {
-                $('#pic img').remove();
-                $('#face').append('<video id="myFace" width="320" height="240" controls autoplay></video>');
-                play();
-            }
-        }
-        , error: function(res) {
-            console.log(res.responseText);
+            });
         }
     });
 }
 
-function doSave(userId) {
+function doSave(userId, password) {
     console.log('doSave');
     $('#pic img').remove();
     $('#messages div').remove();
@@ -147,17 +165,17 @@ function doSave(userId) {
         , 'inputBase64':tempCanvas.toDataURL(IMAGE_MIME).replace(REPLACE_STRING, '')
     };
     console.log(data);
-    doPost(userId, data);
+    doPost(userId, password, data);
 }
 
-function save(userId) {
+function save(userId, password) {
     console.log('save');
     if(typeof navigator.webkitGetUserMedia == 'function') {
         navigator.webkitGetUserMedia({
                 video:true
             }
             , function (stream) {
-                doSave(userId);
+                doSave(userId, password);
             }
             , function (e) {
                 console.error(e);
@@ -168,7 +186,7 @@ function save(userId) {
                 video:true
             }
             , function (stream) {
-                doSave(userId);
+                doSave(userId, password);
             }
             , function (e) {
                 console.error(e);

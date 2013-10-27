@@ -14,7 +14,7 @@
                         <div id="messages"></div>
                         <form onsubmit="return false;">
                             <input id="userId" type="text" class="form-control" placeholder="ユーザーID" autofocus><br>
-                            <input id="password" type="text" class="form-control" placeholder="パスワード">
+                            <input id="password" type="password" class="form-control" placeholder="パスワード">
                             <label class="checkbox">
                                 <input id="saveUserId" type="checkbox" value="ユーザーIDを保存する"><label for="saveUserId">ユーザーIDを保存する</label>
                             </label>
@@ -22,7 +22,7 @@
                                 <div id="face"><video id="myFace" width="320" height="240" controls autoplay></video></div>
                                 <div id="pic"></div>
                             </div>
-                            <button class="btn btn-primary btn-block" type="submit" onclick="save($('#userId').val());">ログイン</button>
+                            <button class="btn btn-primary btn-block" type="submit" onclick="save($('#userId').val(), $('#password').val());">ログイン</button>
                         </form>
                     </div>
                 </div>

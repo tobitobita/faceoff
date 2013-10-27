@@ -9,11 +9,38 @@ var tempCanvas;
 NCMB.initialize("03f14794fcaa21cf389b3d752541483c5f664f25c908cec012a6ccd59235f90f", "5ce863d747e637c2fca8722105d0aa60e778a569a1032f5c122f4ef0e27d01f8");
 var FaceUser = NCMB.Object.extend("FaceUser");
 
-function addUser() {
+function addUser(userId, password, faceId) {
     console.log('addUser');
+    var data = {
+        'apiKey' : API_KEY
+        , 'mode' : 'register'
+        , 'tagsInfo':userId + ',' + faceId
+    };
+    $.ajax({
+        type:"POST"
+        , url:API_CERTIFICATION_URL
+        , data:data
+        , success: function(res) {
+            var resObj = $.xml2json(res);
+            console.log(resObj);
+            var faceUser = new FaceUser();
+            faceUser.set('userId', userId);
+            faceUser.set('password', password);
+            faceUser.save(null, {
+                success: function(result) {
+                    console.log('user add success.');
+                    window.location = '/';
+                }
+            });
+            
+        }
+        , error: function(res) {
+            console.log(res.responseText);
+        }
+    });
 }
 
-function doPost(userId, data) {
+function doPost(userId, password, data) {
     console.log('doPost');
     $.ajax({
         type:"POST"
@@ -21,10 +48,13 @@ function doPost(userId, data) {
         , data:data
         , success: function(res) {
             var resObj = $.xml2json(res);
+            console.log(resObj);
             if(resObj.faceVerification.verificationFaceInfo !== undefined) {
                 console.log('new picture.');
-                addUser();
+                console.log(resObj.faceVerification.verificationFaceInfo.faceId);
+                addUser(userId, password, resObj.faceVerification.verificationFaceInfo.faceId);
             } else {
+                $('#messages').append('<div class="alert alert-danger"><p>もう一度！</p></div>');
                 $('#pic img').remove();
                 $('#face').append('<video id="myFace" width="320" height="240" controls autoplay></video>');
                 play();
@@ -36,7 +66,7 @@ function doPost(userId, data) {
     });
 }
 
-function doSave(userId) {
+function doSave(userId, password) {
     console.log('doSave');
     $('#pic img').remove();
     $('#messages div').remove();
@@ -61,10 +91,10 @@ function doSave(userId) {
         , 'inputBase64':tempCanvas.toDataURL(IMAGE_MIME).replace(REPLACE_STRING, '')
     };
     console.log(data);
-    doPost(userId, data);
+    doPost(userId, password, data);
 }
 
-function save(userId) {
+function save(userId, password) {
     console.log('save');
     if(typeof navigator.webkitGetUserMedia == 'function') {
         navigator.webkitGetUserMedia({
@@ -82,7 +112,7 @@ function save(userId) {
                 video:true
             }
             , function (stream) {
-                doSave(userId);
+                doSave(userId, password);
             }
             , function (e) {
                 console.error(e);

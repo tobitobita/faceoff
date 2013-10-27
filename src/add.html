@@ -14,12 +14,12 @@
                         <div id="messages"></div>
                         <form onsubmit="return false;">
                             <input id="userId" type="text" class="form-control" placeholder="ユーザーID" autofocus><br>
-                            <input id="password" type="text" class="form-control" placeholder="パスワード">
+                            <input id="password" type="password" class="form-control" placeholder="パスワード">
                             <div id="auth">
                                 <div id="face"><video id="myFace" width="320" height="240" controls autoplay></video></div>
                                 <div id="pic"></div>
                             </div>
-                            <button class="btn btn-primary btn-block" type="submit" onclick="save($('#userId').val());">追加</button>
+                            <button class="btn btn-primary btn-block" type="submit" onclick="save($('#userId').val(), $('#password').val());">追加</button>
                         </form>
                     </div>
                 </div>
